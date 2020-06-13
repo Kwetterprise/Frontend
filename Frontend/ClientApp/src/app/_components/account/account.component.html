@@ -1,1 +1,16 @@
-<h2>Welcome, {{user.username}} </h2>
+<div class="container">
+  <div class="row">
+    <div class="col-4">
+      <div class="card">
+        <img class="card-img-top" src="https://via.placeholder.com/256x256?text=Profile%20Picture" alt="{{account?.username}}'s profile picture.">
+        <div class="card-body">
+          <h5 class="card-title">@{{account?.username}}</h5>
+          <p class="card-text">{{account?.bio}}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-8">
+      <post-tweet></post-tweet>
+    </div>
+  </div>
+</div>

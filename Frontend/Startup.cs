@@ -1,12 +1,14 @@
+using Kwetterprise.Frontend.Models;
+using Kwetterprise.ServiceDiscovery.Client;
+using Kwetterprise.ServiceDiscovery.Client.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Frontend
+namespace Kwetterprise.Frontend
 {
     public class Startup
     {
@@ -26,6 +28,20 @@ namespace Frontend
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            RegisterDiscoveryClient(services, this.Configuration);
+
+            RegisterExternals(services, this.Configuration);
+        }
+
+        private static void RegisterExternals(IServiceCollection services, IConfiguration configuration)
+        {
+            var serviceConfigurationSection = configuration.GetSection("Externals");
+
+            var serviceConfiguration =
+                new Externals(serviceConfigurationSection["Account"], serviceConfigurationSection["Tweet"]);
+
+            services.AddSingleton(serviceConfiguration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +59,9 @@ namespace Frontend
             }
 
             app.UseHttpsRedirection();
+
+            app.AddServiceDiscoveryPingMiddleware();
+
             app.UseStaticFiles();
             if (!env.IsDevelopment())
             {
@@ -70,6 +89,15 @@ namespace Frontend
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+        }
+
+        private static void RegisterDiscoveryClient(IServiceCollection services, IConfiguration configuration)
+        {
+            var serviceSection = configuration.GetSection("ServiceDiscovery");
+
+            var serviceConfiguration = new ServiceConfiguration(serviceSection["ServiceName"], serviceSection["ServiceUrl"]);
+            var apiGatewayConfiguration = new ServiceDiscoveryConfiguration(serviceSection["ServiceDiscoveryUrl"]);
+            services.AddServiceDiscoveryClientWorker(serviceConfiguration, apiGatewayConfiguration);
         }
     }
 }

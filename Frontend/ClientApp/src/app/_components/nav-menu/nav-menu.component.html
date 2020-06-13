@@ -32,7 +32,7 @@
             <a class="nav-link text-dark" [routerLink]="['/login']" *ngIf="!authenticationService.isLoggedIn">Login</a>
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/account']" *ngIf="authenticationService.isLoggedIn">My Account</a>
+            <a class="nav-link text-dark" [routerLink]="['/account/my']" *ngIf="authenticationService.isLoggedIn">My Account</a>
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-dark" [routerLink]="['/logout']" *ngIf="authenticationService.isLoggedIn">Logout</a>

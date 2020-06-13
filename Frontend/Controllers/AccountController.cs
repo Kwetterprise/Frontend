@@ -1,42 +1,90 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
+using System.Net.Mime;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Frontend.Models;
+using Kwetterprise.Frontend.Common;
+using Kwetterprise.Frontend.Data;
+using Kwetterprise.Frontend.Data.Account;
+using Kwetterprise.Frontend.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Frontend.Controllers
+using AccountClient = Kwetterprise.Frontend.Data.Account.Client;
+
+namespace Kwetterprise.Frontend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
     public class AccountController : ControllerBase
     {
+        private readonly Externals externals;
+
+        public AccountController(Externals externals)
+        {
+            this.externals = externals;
+        }
+
         [HttpPost]
         [Route("Register")]
-        public RegisterResponse Register(RegisterRequest request)
+        public async Task<Option<UserWithTokenResponse>> Register(RegisterRequest request)
         {
-            if (request.Username == "test")
+            using var client = new HttpClient();
+            var accountClient = new AccountClient(externals.Account, client);
+
+            var createAccount = new CreateAccountRequest
             {
-                return new RegisterResponse
-                {
-                    Error = "Username is already taken.",
-                };
+                Username = request.Username,
+                EmailAddress = request.Email,
+                Password = request.Password,
+            };
+
+            Option<AccountWithTokenDto> response;
+            try
+            {
+                response = (await accountClient.AccountcommandCreateAsync(createAccount)).DeserializeOption();
+            }
+            catch
+            {
+                return Option<UserWithTokenResponse>.FromError("Could not connect to the account service.");
             }
 
-            return new RegisterResponse
+            return response.Select(x => new UserWithTokenResponse
             {
-                CreatedUser =  new UserResponse
-                {
-                    Id = Guid.NewGuid(),
-                    Username = request.Username,
-                    Bio = string.Empty,
-                    Token = "ABC",
-                }
-            };
+                Id = x.Id,
+                Bio = x.Bio,
+                Username = x.Username,
+                Token = x.Token,
+            });
+        }
+
+        [HttpGet]
+        [Route("GetById")]
+        public async Task<Option<UserResponse>> GetById(Guid id)
+        {
+            using var client = new HttpClient();
+            var accountClient = new AccountClient(externals.Account, client);
+
+            Option<AccountDto> response;
+            try
+            {
+                response = (await accountClient.AccountqueryAsync(id)).DeserializeOption();
+            }
+            catch
+            {
+                return Option<UserResponse>.FromError("Could not connect to the account service.");
+            }
+
+            return response.Select(x => new UserResponse
+            {
+                Id = x.Id,
+                Bio = x.Bio,
+                Username = x.Username,
+            });
         }
 
         [HttpDelete]
-        public void Delete(Guid guid)
+        public void Delete(Guid id)
         {
         }
     }

@@ -11,9 +11,13 @@
     <!-- Set this to true if you enable server-side prerendering -->
     <BuildServerSideRenderer>false</BuildServerSideRenderer>
     <Nullable>enable</Nullable>
+    <AssemblyName>Kwetterprise.Frontend</AssemblyName>
+    <RootNamespace>Kwetterprise.Frontend</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Kwetterprise.EventSourcing.Client" Version="1.1.1" />
+    <PackageReference Include="Kwetterprise.ServiceDiscovery.Client" Version="1.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.2" />
   </ItemGroup>
 
@@ -22,6 +26,10 @@
     <Content Remove="$(SpaRoot)**" />
     <None Remove="$(SpaRoot)**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Data\Data.csproj" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

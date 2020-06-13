@@ -9,7 +9,7 @@ import { AuthenticationService } from "../../_services/authentication";
 @Component({ templateUrl: 'login.component.html' })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
-  loading = false;
+  isLoading = false;
   submitted = false;
 
   constructor(
@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
   ) {
     // redirect to home if already logged in
     if (this.authenticationService.isLoggedIn) {
-      this.router.navigate(['/account']);
+      this.router.navigate(['/account', 'my']);
     }
   }
 
@@ -45,16 +45,16 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
+    this.isLoading = true;
     this.authenticationService.login(this.f.username.value, this.f.password.value)
       .pipe(first())
       .subscribe(
         data => {
-          this.router.navigate(['/account']);
+          this.router.navigate(['/account', 'me']);
         },
         error => {
           this.alertService.error(error);
-          this.loading = false;
+          this.isLoading = false;
         });
   }
 }

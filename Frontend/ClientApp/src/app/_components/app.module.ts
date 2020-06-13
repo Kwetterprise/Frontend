@@ -12,6 +12,7 @@ import { LogoutComponent } from "./logout/logout.component";
 import { RegisterComponent } from './register/register.component';
 import { AccountComponent } from './account/account.component';
 import { AlertComponent } from "./alert/alert.component";
+import { PostTweetComponent } from "./post-tweet/post-tweet.component";
 // import { CounterComponent } from './counter/counter.component';
 // import { FetchDataComponent } from './fetch-data/fetch-data.component';
 
@@ -25,7 +26,8 @@ NgModule({
     RegisterComponent,
     LogoutComponent,
     AccountComponent,
-    AlertComponent
+    AlertComponent,
+    PostTweetComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -37,7 +39,7 @@ NgModule({
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       { path: 'logout', component: LogoutComponent },
-      { path: 'account', component: AccountComponent }
+      { path: 'account/:id', component: AccountComponent }
     ])
   ],
   providers: [],

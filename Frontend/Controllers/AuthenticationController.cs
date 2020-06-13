@@ -1,32 +1,60 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
+using System.Net.Mime;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Frontend.Models;
+using Kwetterprise.Frontend.Common;
+using Kwetterprise.Frontend.Data;
+using Kwetterprise.Frontend.Data.Account;
+using Kwetterprise.Frontend.Models;
 using Microsoft.AspNetCore.Mvc;
+using AuthenticateRequest = Kwetterprise.Frontend.Models.AuthenticateRequest;
+using AccountClient = Kwetterprise.Frontend.Data.Account.Client;
 
-namespace Frontend.Controllers
+namespace Kwetterprise.Frontend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
     public class AuthenticationController : ControllerBase
     {
+        private readonly Externals externals;
+
+        public AuthenticationController(Externals externals)
+        {
+            this.externals = externals;
+        }
+
         [HttpPost]
         [Route("Authenticate")]
-        public UserResponse? Authenticate(AuthenticateRequest request)
+        public async Task<Option<UserWithTokenResponse>> Authenticate(AuthenticateRequest request)
         {
-            if (request.UserName != request.Password)
+            using var client = new HttpClient();
+            var accountClient = new AccountClient(externals.Account, client);
+
+            var authenticateRequest = new Data.Account.AuthenticateRequest()
             {
-                return null;
+                Username = request.Username,
+                Password = request.Password,
+            };
+
+            Option<AccountWithTokenDto> response;
+            try
+            {
+                response = (await accountClient.AccountqueryAuthenticateAsync(authenticateRequest)).DeserializeOption();
+            }
+            catch
+            {
+                return Option<UserWithTokenResponse>.FromError("Could not connect to the account service.");
             }
 
-            return new UserResponse
+            return response.Select(x => new UserWithTokenResponse
             {
-                Id = Guid.NewGuid(),
-                Token = "ABCDEF=",
-                Username = request.UserName,
-                Bio = "I like to post tweets.",
-            };
+                Id = x.Id,
+                Bio = x.Bio,
+                Username = x.Username,
+                Token = x.Token,
+            });
         }
     }
 }

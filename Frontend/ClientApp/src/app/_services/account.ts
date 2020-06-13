@@ -2,19 +2,23 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Guid } from "guid-typescript";
-import { UserInfo } from "../_models/UserInfo";
 import { RegisterRequest } from "../_models/RegisterRequest";
-import { RegisterResponse } from "../_models/RegisterResponse";
 import { HttpErrorResponse } from "@angular/common/http/http";
 import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { UserResult } from "../_models/UserResult";
+import { Account, AccountWithToken } from "../_models/Account";
+import { Option } from "../_models/Option";
+import { AuthenticationService } from "./authentication";
 
 @Injectable({ providedIn: 'root' })
-export class UserService {
+export class AccountService {
   private readonly baseUrl: string;
+  private readonly authenticationService: AuthenticationService;
 
-  constructor(private readonly http: HttpClient, @Inject('BASE_URL') baseUrl: string) { this.baseUrl = baseUrl; }
+  constructor(private readonly http: HttpClient, authenticationService: AuthenticationService, @Inject('BASE_URL') baseUrl: string) {
+    this.authenticationService = authenticationService;
+    this.baseUrl = baseUrl;
+  }
 
   private handleError(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {
@@ -32,17 +36,31 @@ export class UserService {
   };
 
   register(user: RegisterRequest) {
-    return this.http.post<RegisterResponse>(`${this.baseUrl}Account/Register`, user)
-      .pipe(catchError(this.handleError), map(data => {
-        if (data.error !== null) {
-          throw new Error(data.error);
-        }
+    return this.http.post<Option<AccountWithToken>>(`${this.baseUrl}Account/Register`, user)
+      .pipe(catchError(this.handleError),
+        map(data => {
+          if (data.hasFailed) {
+            throw new Error(data.error);
+          }
 
-        return data.createdUser;
-      }));
+          this.authenticationService.setUserData(data.value);
+          return data.value;
+        }));
   }
 
-  update(user: UserInfo) {
+  getById(id: Guid) {
+    return this.http.get<Option<Account>>(`${this.baseUrl}Account/GetById?id=${id}`)
+      .pipe(catchError(this.handleError),
+        map(data => {
+          if (data.hasFailed) {
+            throw new Error(data.error);
+          }
+
+          return data.value;
+        }));
+  }
+
+  update(user: Account) {
     return this.http.post(`${this.baseUrl}Account/Update`, user);
   }
 

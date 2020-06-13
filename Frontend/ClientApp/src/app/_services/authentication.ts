@@ -4,21 +4,22 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
-import { UserResult as User } from "../_models/UserResult";
+import { AccountWithToken } from "../_models/Account";
+import { Option } from "../_models/option";
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
-  private readonly currentUserSubject: BehaviorSubject<User>;
+  private readonly currentUserSubject: BehaviorSubject<AccountWithToken>;
   private readonly baseUrl: string;
-  public currentUser: Observable<User>;
+  public currentUser: Observable<AccountWithToken>;
 
   constructor(private readonly http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.baseUrl = baseUrl;
-    this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('currentUser')));
+    this.currentUserSubject = new BehaviorSubject<AccountWithToken>(JSON.parse(localStorage.getItem('currentUser')));
     this.currentUser = this.currentUserSubject.asObservable();
   }
 
-  public get currentUserValue(): User {
+  public get currentUserValue(): AccountWithToken {
     return this.currentUserSubject.value;
   }
 
@@ -42,24 +43,29 @@ export class AuthenticationService {
   };
 
   login(username, password) {
-    return this.http.post<User>(`${this.baseUrl}Authentication/Authenticate`, { username, password })
+    return this.http.post<Option<AccountWithToken>>(`${this.baseUrl}Authentication/Authenticate`, { username, password })
       .pipe(
         catchError(this.handleError),
-        map(user => {
-          if (user === null) {
-            throw new Error("Invalid username and password.");
+        map(result => {
+          if (result.hasFailed) {
+            throw new Error(result.error);
           }
 
-          // store user details and jwt token in local storage to keep user logged in between page refreshes
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          this.currentUserSubject.next(user);
-          return user;
-      }));
+          this.setUserData(result.value);
+
+          return result.value;
+        }));
   }
 
   logout() {
     // remove user from local storage and set current user to null
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
+  }
+
+  setUserData(result: AccountWithToken) {
+    // store user details and jwt token in local storage to keep user logged in between page refreshes
+    localStorage.setItem('currentUser', JSON.stringify(result));
+    this.currentUserSubject.next(result);
   }
 }

@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
 import { AuthenticationService } from "../../_services/authentication";
-import { UserService } from "../../_services/user";
+import { AccountService } from "../../_services/account";
 import { AlertService } from "../../_services/alert";
 
 @Component({ templateUrl: 'register.component.html' })
@@ -18,7 +18,7 @@ export class RegisterComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly authenticationService: AuthenticationService,
-    private readonly userService: UserService,
+    private readonly accountService: AccountService,
     private readonly alertService: AlertService
   ) { }
 
@@ -53,12 +53,13 @@ export class RegisterComponent implements OnInit {
     }
 
     this.loading = true;
-    this.userService.register(this.registerForm.value)
+    this.accountService.register(this.registerForm.value)
       .pipe(first())
       .subscribe(
         data => {
           this.alertService.success('Registration successful.', true);
-          this.router.navigate(['/login']);
+          this.authenticationService.setUserData(data);
+          this.router.navigate(['/account/my']);
         },
         error => {
           this.alertService.error(error);
