@@ -18,17 +18,17 @@ export class LoginComponent implements OnInit {
     private readonly authenticationService: AuthenticationService,
     private readonly alertService: AlertService
   ) {
-    // redirect to home if already logged in
-    if (this.authenticationService.isLoggedIn) {
-      this.router.navigate(['/account', 'my']);
-    }
-  }
-
-  ngOnInit() {
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
+  }
+
+  ngOnInit() {
+    // redirect to home if already logged in
+    if (this.authenticationService.isLoggedIn) {
+      this.router.navigate(['/account', 'my']);
+    }
   }
 
   // convenience getter for easy access to form fields

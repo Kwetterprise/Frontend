@@ -9,14 +9,18 @@ import { throwError } from 'rxjs';
 import { Account, AccountWithToken } from "../_models/Account";
 import { Option } from "../_models/Option";
 import { AuthenticationService } from "./authentication";
+import { PagedData } from "../_models/PagedData";
+import { AlertService } from "./alert";
 
 @Injectable({ providedIn: 'root' })
 export class AccountService {
   private readonly baseUrl: string;
-  private readonly authenticationService: AuthenticationService;
 
-  constructor(private readonly http: HttpClient, authenticationService: AuthenticationService, @Inject('BASE_URL') baseUrl: string) {
-    this.authenticationService = authenticationService;
+  constructor(
+    private readonly http: HttpClient,
+    private readonly authenticationService: AuthenticationService,
+    private readonly alertService: AlertService,
+    @Inject('BASE_URL') baseUrl: string) {
     this.baseUrl = baseUrl;
   }
 
@@ -49,7 +53,7 @@ export class AccountService {
   }
 
   getById(id: Guid) {
-    return this.http.get<Option<Account>>(`${this.baseUrl}Account/GetById?id=${id}`)
+    return this.http.get<Option<Account>>(`${this.baseUrl}Account?id=${id}`)
       .pipe(catchError(this.handleError),
         map(data => {
           if (data.hasFailed) {
@@ -66,5 +70,18 @@ export class AccountService {
 
   delete(id: Guid) {
     return this.http.delete(`${this.baseUrl}Account/${id}`);
+  }
+
+  getAll(usernameFilter: string, pageSize: number, pageNumber: number) {
+    return this.http.get<Option<PagedData<Account>>>(`${this.baseUrl}Account/GetAll?usernameFilter=${usernameFilter}&pageSize=${pageSize}&pageNumber=${pageNumber}`)
+      .pipe(catchError(this.handleError),
+        map(data => {
+          if (data.hasFailed) {
+            this.alertService.error(data.error);
+            return null;
+          }
+
+          return data.value;
+        }));
   }
 }

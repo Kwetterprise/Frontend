@@ -1,0 +1,11 @@
+<div class="card" *ngFor="let tweet of tweets">
+  <h4 class="card-header">@{{ tweet.author.username}} </h4>
+  <div class="card-body">
+    {{ tweet.content }}<br/>
+    Posted on: {{ tweet.postedOn }}
+  </div>
+</div>
+<div class="text-center">
+  <div *ngIf="isEnded">There are no more tweets.</div>
+  <button class="btn btn-primary" (click)="loadMore()" *ngIf="!isEnded">Load more</button>
+</div>

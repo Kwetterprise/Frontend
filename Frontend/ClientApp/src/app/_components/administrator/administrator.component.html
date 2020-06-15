@@ -1,0 +1,19 @@
+<div class="container">
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Username</th>
+      <th scope="col">Role</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let account of accounts?.data; index as i">
+      <th scope="row">{{ account.id }}</th>
+      <td>{{ account.username }}</td>
+      <td>{{ account.role }}</td>
+    </tr>
+    </tbody>
+  </table>
+  Showing page {{ accounts?.pageNumber }} of {{ accounts?.totalCount / accounts?.pageSize }}
+</div>

@@ -13,7 +13,7 @@
     <div class="card-footer">
       <div class="form-group">
         <div class="text-right">
-          {{ f.content.value.length }}/280
+          <div [ngClass]="{ 'is-invalid': f.content.value.length > 280 }">{{ f.content.value.length }}/280</div>
           <button [disabled]="isLoading" class="btn btn-primary">
             <span *ngIf="isLoading" class="spinner-border spinner-border-sm mr-1"></span>
             Post Tweet

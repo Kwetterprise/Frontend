@@ -16,9 +16,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kwetterprise.EventSourcing.Client" Version="1.1.1" />
-    <PackageReference Include="Kwetterprise.ServiceDiscovery.Client" Version="1.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.2" />
+    <PackageReference Include="Kwetterprise.EventSourcing.Client" Version="1.1.3" />
+    <PackageReference Include="Kwetterprise.ServiceDiscovery.Client" Version="1.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.5" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.5" />
   </ItemGroup>
 
   <ItemGroup>

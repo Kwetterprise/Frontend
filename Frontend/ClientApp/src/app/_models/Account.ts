@@ -5,8 +5,15 @@ export class Account {
   username: string;
   bio: string;
   profilePicture: number[];
+  role: Role;
 
   token: string;
+}
+
+export enum Role {
+  User,
+  Moderator,
+  Administrator,
 }
 
 export class AccountWithToken extends Account {

@@ -1,10 +1,11 @@
 import { Injectable, Inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { Guid } from "guid-typescript";
 
-import { AccountWithToken } from "../_models/Account";
+import { AccountWithToken, Role } from "../_models/Account";
 import { Option } from "../_models/option";
 
 @Injectable({ providedIn: 'root' })
@@ -25,6 +26,14 @@ export class AuthenticationService {
 
   public get isLoggedIn(): boolean {
     return this.currentUserValue !== null;
+  }
+
+  public get isAdministrator(): boolean {
+    return this.currentUserValue !== null && this.currentUserValue.role === Role.Administrator;
+  }
+
+  public isCurrentUser(id: Guid): boolean {
+    return this.isLoggedIn && this.currentUserValue.id === id;
   }
 
   private handleError(error: HttpErrorResponse) {

@@ -1,12 +1,14 @@
 using Kwetterprise.Frontend.Models;
 using Kwetterprise.ServiceDiscovery.Client;
 using Kwetterprise.ServiceDiscovery.Client.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Kwetterprise.Frontend
 {
@@ -32,6 +34,7 @@ namespace Kwetterprise.Frontend
             RegisterDiscoveryClient(services, this.Configuration);
 
             RegisterExternals(services, this.Configuration);
+            ConfigureAuthentication(services, this.Configuration);
         }
 
         private static void RegisterExternals(IServiceCollection services, IConfiguration configuration)
@@ -70,6 +73,9 @@ namespace Kwetterprise.Frontend
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -98,6 +104,34 @@ namespace Kwetterprise.Frontend
             var serviceConfiguration = new ServiceConfiguration(serviceSection["ServiceName"], serviceSection["ServiceUrl"]);
             var apiGatewayConfiguration = new ServiceDiscoveryConfiguration(serviceSection["ServiceDiscoveryUrl"]);
             services.AddServiceDiscoveryClientWorker(serviceConfiguration, apiGatewayConfiguration);
+        }
+
+        private static void ConfigureAuthentication(IServiceCollection services, IConfiguration configuration)
+        {
+            var jwtSection = configuration.GetSection("Jwt");
+            var jwtConfiguration = new JwtConfiguration(jwtSection["Issuer"], jwtSection["Key"]);
+            services.AddSingleton(jwtConfiguration);
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = true;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    IssuerSigningKey = new SymmetricSecurityKey(jwtConfiguration.Key),
+                    ValidIssuer = jwtConfiguration.Issuer,
+                    ValidAudience = jwtConfiguration.Issuer,
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                };
+            });
+
+            services.AddMvc();
         }
     }
 }

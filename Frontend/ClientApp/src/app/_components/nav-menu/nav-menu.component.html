@@ -32,6 +32,9 @@
             <a class="nav-link text-dark" [routerLink]="['/login']" *ngIf="!authenticationService.isLoggedIn">Login</a>
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
+            <a class="nav-link text-dark" [routerLink]="['/administrator']" *ngIf="authenticationService.isAdministrator">Admin panel</a>
+          </li>
+          <li class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-dark" [routerLink]="['/account/my']" *ngIf="authenticationService.isLoggedIn">My Account</a>
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">

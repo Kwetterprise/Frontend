@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Net.Http;
-using System.Net.Mime;
-using System.Text;
-using System.Text.Json;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Kwetterprise.Frontend.Common;
 using Kwetterprise.Frontend.Data;
-using Kwetterprise.Frontend.Data.Account;
+using Kwetterprise.Frontend.Data.Tweet;
 using Kwetterprise.Frontend.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using AccountClient = Kwetterprise.Frontend.Data.Account.Client;
+using Microsoft.Net.Http.Headers;
+using Option = Kwetterprise.Frontend.Common.Option;
+using TweetClient = Kwetterprise.Frontend.Data.Tweet.Client;
 
 namespace Kwetterprise.Frontend.Controllers
 {
@@ -26,36 +27,43 @@ namespace Kwetterprise.Frontend.Controllers
         }
 
         [HttpPost]
-        public async Task<Option> Post()
+        public async Task<Option<TweetDto>> Post(PostTweetRequest postTweetRequest)
         {
-            return Option.Success;
-            //using var client = new HttpClient();
-            //var accountClient = new AccountClient(externals.Account, client);
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                JwtBearerDefaults.AuthenticationScheme,
+                this.HttpContext.Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", ""));
+            var tweetClient = new TweetClient(externals.Tweet, client);
 
-            //var createAccount = new CreateAccountRequest
-            //{
-            //    Username = request.Username,
-            //    EmailAddress = request.Email,
-            //    Password = request.Password,
-            //};
+            try
+            {
+                return (await tweetClient.TweetcommandPostAsync(postTweetRequest)).DeserializeOption();
+            }
+            catch (Exception e)
+            {
+                return Option<TweetDto>.FromError(e.Message);
+            }
+        }
 
-            //Option<AccountWithTokenDto> response;
-            //try
-            //{
-            //    response = (await accountClient.AccountcommandCreateAsync(createAccount)).DeserializeOption();
-            //}
-            //catch
-            //{
-            //    return Option<UserWithTokenResponse>.FromError("Could not connect to the account service.");
-            //}
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("GetFromUser")]
+        public async Task<Option<TimedData<TweetDto>>> GetFromUser(Guid id, Guid? from, bool ascending, int count)
+        {
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                JwtBearerDefaults.AuthenticationScheme,
+                this.HttpContext.Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", ""));
+            var tweetClient = new TweetClient(externals.Tweet, client);
 
-            //return response.Select(x => new UserWithTokenResponse
-            //{
-            //    Id = x.Id,
-            //    Bio = x.Bio,
-            //    Username = x.Username,
-            //    Token = x.Token,
-            //});
+            try
+            {
+                return (await tweetClient.TweetqueryGetfromuserAsync(id, from, ascending, count)).DeserializeOption();
+            }
+            catch (Exception e)
+            {
+                return Option<TimedData<TweetDto>>.FromError(e.Message);
+            }
         }
     }
 }

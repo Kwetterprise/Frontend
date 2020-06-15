@@ -11,6 +11,7 @@
     </div>
     <div class="col-8">
       <post-tweet></post-tweet>
+      <tweet-list [getTimedTweets]="getNextTweets.bind(this)"></tweet-list>
     </div>
   </div>
 </div>

@@ -13,8 +13,9 @@ import { RegisterComponent } from './register/register.component';
 import { AccountComponent } from './account/account.component';
 import { AlertComponent } from "./alert/alert.component";
 import { PostTweetComponent } from "./post-tweet/post-tweet.component";
-// import { CounterComponent } from './counter/counter.component';
-// import { FetchDataComponent } from './fetch-data/fetch-data.component';
+import { AdministratorComponent } from "./administrator/administrator.component";
+import { JwtInterceptor } from "../_helpers/jwt.interceptor";
+import { TweetListComponent } from "./tweet-list/tweet-list.component";
 
 @
 NgModule({
@@ -27,7 +28,9 @@ NgModule({
     LogoutComponent,
     AccountComponent,
     AlertComponent,
-    PostTweetComponent
+    PostTweetComponent,
+    AdministratorComponent,
+    TweetListComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -39,10 +42,13 @@ NgModule({
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       { path: 'logout', component: LogoutComponent },
-      { path: 'account/:id', component: AccountComponent }
+      { path: 'account/:id', component: AccountComponent },
+      { path: 'administrator', component: AdministratorComponent }
     ])
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

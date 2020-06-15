@@ -54,6 +54,7 @@ namespace Kwetterprise.Frontend.Controllers
                 Bio = x.Bio,
                 Username = x.Username,
                 Token = x.Token,
+                Role = x.Role,
             });
         }
     }
