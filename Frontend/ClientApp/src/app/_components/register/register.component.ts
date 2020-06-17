@@ -10,7 +10,7 @@ import { AlertService } from "../../_services/alert";
 @Component({ templateUrl: 'register.component.html' })
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
-  loading = false;
+  isLoading = false;
   submitted = false;
 
   constructor(
@@ -52,7 +52,7 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
+    this.isLoading = true;
     this.accountService.register(this.registerForm.value)
       .pipe(first())
       .subscribe(
@@ -63,7 +63,7 @@ export class RegisterComponent implements OnInit {
         },
         error => {
           this.alertService.error(error);
-          this.loading = false;
+          this.isLoading = false;
         });
   }
 }

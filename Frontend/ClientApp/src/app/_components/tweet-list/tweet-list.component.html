@@ -1,8 +1,13 @@
 <div class="card" *ngFor="let tweet of tweets">
-  <h4 class="card-header">@{{ tweet.author.username}} </h4>
+  <h4 class="card-header" (click)="goToProfile(tweet.author.id)">@{{ tweet.author.username}} </h4>
   <div class="card-body">
-    {{ tweet.content }}<br/>
+    {{ tweet.content }}<br />
     Posted on: {{ tweet.postedOn }}
+  </div>
+  <div *ngIf="isCurrentUser(tweet.author.id)" class="card-footer">
+    <p (click)="deleteTweet(tweet.id)">
+      Delete
+    </p>
   </div>
 </div>
 <div class="text-center">

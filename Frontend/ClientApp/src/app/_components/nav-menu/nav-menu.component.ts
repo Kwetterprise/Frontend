@@ -7,7 +7,7 @@ import { AuthenticationService } from "../../_services/authentication";
   styleUrls: ['./nav-menu.component.css']
 })
 export class NavMenuComponent {
-  private readonly authenticationService: AuthenticationService;
+  public readonly authenticationService: AuthenticationService;
   isLoggedIn = false;
   isExpanded = false;
 

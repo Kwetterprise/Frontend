@@ -7,7 +7,7 @@ import { Guid } from "guid-typescript";
 
 import { AuthenticationService } from "./authentication";
 import { Tweet, PostTweetRequest } from "../_models/Tweet";
-import { Option } from "../_models/Option";
+import { Option, SimpleOption } from "../_models/Option";
 import { PagedData } from "../_models/PagedData";
 import { TimedData } from "../_models/TimedData";
 
@@ -56,6 +56,24 @@ export class TweetService {
         }));
   }
 
+  getAll(ascending: boolean, count: number, from?: Guid) {
+    let url = `${this.baseUrl}Tweet/GetAll?ascending=${ascending}&count=${count}`;
+
+    if (from) {
+      url += `&from=${from}`;
+    }
+
+    return this.http.get<Option<TimedData<Tweet>>>(url)
+      .pipe(catchError(this.handleError),
+        map(data => {
+          if (data.hasFailed) {
+            throw new Error(data.error);
+          }
+
+          return data.value;
+        }));
+  }
+
   post(content: string, parentTweet: Guid) {
     if (!this.authenticationService.isLoggedIn) {
       return throwError("You are not logged in.");
@@ -71,6 +89,16 @@ export class TweetService {
           }
 
           return data.value;
+        }));
+  }
+
+  delete(id: Guid) {
+    return this.http.delete<SimpleOption>(`${this.baseUrl}Tweet?id=${id}`)
+      .pipe(catchError(this.handleError),
+        map(data => {
+          if (data.hasFailed) {
+            throw new Error(data.error);
+          }
         }));
   }
 }

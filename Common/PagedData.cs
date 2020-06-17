@@ -13,10 +13,10 @@ namespace Kwetterprise.Frontend.Common
 
         public PagedData(int pageSize, int pageNumber, int totalCount, List<T> data)
         {
-            PageSize = pageSize;
-            PageNumber = pageNumber;
-            TotalCount = totalCount;
-            Data = data;
+            this.PageSize = pageSize;
+            this.PageNumber = pageNumber;
+            this.TotalCount = totalCount;
+            this.Data = data;
         }
 
         public int PageSize { get; set; }
@@ -25,7 +25,7 @@ namespace Kwetterprise.Frontend.Common
 
         public int TotalCount { get; set; }
 
-        public List<T> Data { get; set; }
+        public List<T> Data { get; set; } = null!;
 
         public PagedData<TOut> Select<TOut>(Func<T, TOut> selector)
         {
@@ -50,7 +50,7 @@ namespace Kwetterprise.Frontend.Common
 
         public bool Ascending { get; set; }
 
-        public List<T> Data { get; set; }
+        public List<T> Data { get; set; } = null!;
 
         public TimedData<TOut> Select<TOut>(Func<T, TOut> selector)
         {

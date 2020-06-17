@@ -302,18 +302,31 @@ namespace Kwetterprise.Frontend.Data.Tweet
     
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<string> TweetqueryTestAsync()
+        public System.Threading.Tasks.Task<TweetDtoTimedData> TweetqueryGetallAsync(System.Guid? from, bool? ascending, int? count)
         {
-            return TweetqueryTestAsync(System.Threading.CancellationToken.None);
+            return TweetqueryGetallAsync(from, ascending, count, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<string> TweetqueryTestAsync(System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<TweetDtoTimedData> TweetqueryGetallAsync(System.Guid? from, bool? ascending, int? count, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/TweetQuery/Test");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/TweetQuery/GetAll?");
+            if (from != null) 
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("from") + "=").Append(System.Uri.EscapeDataString(ConvertToString(from, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (ascending != null) 
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("ascending") + "=").Append(System.Uri.EscapeDataString(ConvertToString(ascending, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (count != null) 
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("count") + "=").Append(System.Uri.EscapeDataString(ConvertToString(count, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            urlBuilder_.Length--;
     
             var client_ = _httpClient;
             try
@@ -343,7 +356,7 @@ namespace Kwetterprise.Frontend.Data.Tweet
                         var status_ = ((int)response_.StatusCode).ToString();
                         if (status_ == "200") 
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<string>(response_, headers_).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<TweetDtoTimedData>(response_, headers_).ConfigureAwait(false);
                             return objectResponse_.Object;
                         }
                         else
@@ -353,7 +366,7 @@ namespace Kwetterprise.Frontend.Data.Tweet
                             throw new ApiException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
                         }
             
-                        return default(string);
+                        return default(TweetDtoTimedData);
                     }
                     finally
                     {
@@ -522,6 +535,9 @@ namespace Kwetterprise.Frontend.Data.Tweet
         [Newtonsoft.Json.JsonProperty("parentTweet", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Guid? ParentTweet { get; set; }
     
+        [Newtonsoft.Json.JsonProperty("postedOn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset PostedOn { get; set; }
+    
     
     }
     
@@ -597,8 +613,7 @@ namespace Kwetterprise.Frontend.Data.Tweet
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.1.21.0 (Newtonsoft.Json v12.0.0.2)")]
     public partial class TweetDtoTimedData 
     {
-        [Newtonsoft.Json.JsonProperty("next", Required = Newtonsoft.Json.Required.AllowNull)]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [Newtonsoft.Json.JsonProperty("next", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Guid? Next { get; set; }
     
         [Newtonsoft.Json.JsonProperty("ascending", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]

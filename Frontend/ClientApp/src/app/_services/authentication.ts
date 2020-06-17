@@ -6,7 +6,7 @@ import { throwError } from 'rxjs';
 import { Guid } from "guid-typescript";
 
 import { AccountWithToken, Role } from "../_models/Account";
-import { Option } from "../_models/option";
+import { Option } from "src/app/_models/Option";
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {

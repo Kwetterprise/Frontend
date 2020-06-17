@@ -8,20 +8,13 @@ namespace Kwetterprise.Frontend.Pages
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class ErrorModel : PageModel
     {
-        private readonly ILogger<ErrorModel> _logger;
+        public string RequestId { get; set; } = null!;
 
-        public ErrorModel(ILogger<ErrorModel> logger)
-        {
-            _logger = logger;
-        }
-
-        public string RequestId { get; set; }
-
-        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+        public bool ShowRequestId => !string.IsNullOrEmpty(this.RequestId);
 
         public void OnGet()
         {
-            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            this.RequestId = Activity.Current?.Id ?? this.HttpContext.TraceIdentifier;
         }
     }
 }

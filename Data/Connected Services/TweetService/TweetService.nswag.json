@@ -223,29 +223,55 @@
         }
       }
     },
-    "/TweetQuery/Test": {
+    "/TweetQuery/GetAll": {
       "get": {
         "tags": [
           "TweetQuery"
         ],
-        "operationId": "Test",
+        "operationId": "GetAll",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "nullable": true
+            }
+          },
+          {
+            "name": "ascending",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/TweetDtoTimedData"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/TweetDtoTimedData"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/TweetDtoTimedData"
                 }
               }
             }
@@ -323,9 +349,12 @@
           },
           "parentTweet": {
             "type": "string",
-            "readOnly": true,
             "format": "uuid",
             "nullable": true
+          },
+          "postedOn": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -406,13 +435,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "data",
-          "next"
+          "data"
         ],
         "properties": {
           "next": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "nullable": true
           },
           "ascending": {
             "type": "boolean"
