@@ -1,6 +1,7 @@
 import { Guid } from "guid-typescript";
 
 export class Tweet {
+  id: Guid;
   content: string;
   author: Author;
   createdOn: Date;

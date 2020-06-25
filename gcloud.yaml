@@ -46,8 +46,8 @@ spec:
         - containerPort: 80
         env:
           - name: Externals__Account
-            value: http://account-service
+            value: http://account-service:6223
           - name: Externals__Tweet
-            value: http://tweet-service
+            value: http://tweet-service:6224
           - name: Logging__Default
             value: Trace

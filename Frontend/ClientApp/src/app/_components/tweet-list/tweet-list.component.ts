@@ -43,7 +43,7 @@ export class TweetListComponent implements AfterContentInit {
     }
 
     this.isLoading = true;
-    const count = 2;
+    const count = 10;
     this.getTimedTweets(count, this.next).then(x => {
       this.next = x.next;
       this.tweets.push(...x.data);
@@ -73,7 +73,11 @@ export class TweetListComponent implements AfterContentInit {
   async deleteTweet(id: Guid) {
     try {
       await this.tweetService.delete(id).toPromise();
-
+      for (let i = 0; i < this.tweets.length; i++) {
+        if (this.tweets[i].id === id) {
+          this.tweets.splice(i, 1);
+        }
+      }
     } catch (err) {
       this.alertService.error(err);
     }

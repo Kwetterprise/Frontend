@@ -16,15 +16,18 @@ using TweetClient = Kwetterprise.Frontend.Data.Tweet.Client;
 namespace Kwetterprise.Frontend.Controllers
 {
     using System.Linq;
+    using Microsoft.Extensions.Logging;
 
     [ApiController]
     [Route("[controller]")]
     public class TweetController : ControllerBase
     {
+        private readonly ILogger<TweetController> logger;
         private readonly Externals externals;
 
-        public TweetController(Externals externals)
+        public TweetController(ILogger<TweetController> logger, Externals externals)
         {
+            this.logger = logger;
             this.externals = externals;
         }
 
@@ -79,6 +82,8 @@ namespace Kwetterprise.Frontend.Controllers
                 this.HttpContext.Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", ""));
             var tweetClient = new TweetClient(this.externals.Tweet, client);
 
+            this.logger.LogInformation($"Tweet client: {this.externals.Tweet}");
+
             try
             {
                 return Option<TimedData<TweetDto>>.FromResult(
@@ -86,6 +91,7 @@ namespace Kwetterprise.Frontend.Controllers
             }
             catch (Exception e)
             {
+                this.logger.LogError(e, "Error during query.");
                 return Option<TimedData<TweetDto>>.FromError(e.Message);
             }
         }
